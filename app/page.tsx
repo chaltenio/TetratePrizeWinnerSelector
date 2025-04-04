@@ -2,22 +2,26 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Trophy, Medal, Upload } from "lucide-react"
+import { Trophy, Medal, Upload, Mail, AlertCircle } from "lucide-react"
 import { parseCSV } from "@/lib/csv-parser"
 
 type Friend = {
-  Order: number
   First_Name: string
   Last_Name: string
+  Created: string
+  email: string
 }
 
 export default function PrizePicker() {
   const [winners, setWinners] = useState<Friend[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [fileName, setFileName] = useState("")
+  const [previousWinners, setPreviousWinners] = useState<Set<string>>(new Set())
+  const allFriendsRef = useRef<Friend[]>([])
+  const [showWarning, setShowWarning] = useState(false)
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -25,19 +29,31 @@ export default function PrizePicker() {
 
     setIsLoading(true)
     setFileName(file.name)
+    setShowWarning(false)
 
     try {
       const text = await file.text()
       const friends = parseCSV<Friend>(text)
+      allFriendsRef.current = friends
+
+      // Reset previous winners when uploading a new file
+      setPreviousWinners(new Set())
 
       // Shuffle and pick 5 winners
       const shuffled = [...friends].sort(() => 0.5 - Math.random())
       const selected = shuffled.slice(0, 5)
 
+      // Add these winners to the set of previous winners
+      const newPreviousWinners = new Set(previousWinners)
+      selected.forEach((winner) => newPreviousWinners.add(winner.email))
+      setPreviousWinners(newPreviousWinners)
+
       setWinners(selected)
     } catch (error) {
       console.error("Error parsing CSV:", error)
-      alert("Error parsing CSV file. Please make sure it's a valid CSV with Order, First_Name, and Last_Name columns.")
+      alert(
+        "Error parsing CSV file. Please make sure it's a valid CSV with First_Name, Last_Name, Created, and email columns.",
+      )
     } finally {
       setIsLoading(false)
     }
@@ -45,12 +61,29 @@ export default function PrizePicker() {
 
   const handlePickAgain = () => {
     setIsLoading(true)
+    setShowWarning(false)
 
     setTimeout(() => {
-      if (winners.length > 0) {
-        const allFriends = [...winners]
-        const shuffled = [...allFriends].sort(() => 0.5 - Math.random())
+      if (allFriendsRef.current.length > 0) {
+        // Filter out previously selected winners
+        const availableFriends = allFriendsRef.current.filter((friend) => !previousWinners.has(friend.email))
+
+        // Check if we have enough available friends
+        if (availableFriends.length < 5) {
+          setShowWarning(true)
+          setIsLoading(false)
+          return
+        }
+
+        // Shuffle and pick 5 new winners
+        const shuffled = [...availableFriends].sort(() => 0.5 - Math.random())
         const selected = shuffled.slice(0, 5)
+
+        // Add these winners to the set of previous winners
+        const newPreviousWinners = new Set(previousWinners)
+        selected.forEach((winner) => newPreviousWinners.add(winner.email))
+        setPreviousWinners(newPreviousWinners)
+
         setWinners(selected)
       }
       setIsLoading(false)
@@ -73,7 +106,7 @@ export default function PrizePicker() {
               <div className="text-center">
                 <h3 className="text-lg font-medium">Upload your friends list</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Select your CSV file with Order, First_Name, and Last_Name columns
+                  Select your CSV file with First_Name, Last_Name, Created, and email columns
                 </p>
               </div>
               <div className="relative">
@@ -92,15 +125,30 @@ export default function PrizePicker() {
             </div>
           ) : (
             <div className="space-y-6 py-4">
+              {showWarning && (
+                <div className="bg-amber-50 border border-amber-200 rounded-md p-3 flex items-start mb-4">
+                  <AlertCircle className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-amber-700">
+                    Not enough unique names left in the list. Please upload a new file to continue.
+                  </p>
+                </div>
+              )}
+
               <div className="flex items-center justify-center">
                 <Card className="w-full bg-gradient-to-r from-yellow-100 to-yellow-200 border-yellow-300">
-                  <CardContent className="flex items-center p-6">
-                    <Trophy className="h-12 w-12 text-yellow-600 mr-4" />
-                    <div>
-                      <h3 className="text-xl font-bold">Grand Prize Winner</h3>
-                      <p className="text-2xl font-semibold text-yellow-800">
-                        {winners[0].First_Name} {winners[0].Last_Name}
-                      </p>
+                  <CardContent className="flex flex-col p-6">
+                    <div className="flex items-center mb-3">
+                      <Trophy className="h-12 w-12 text-yellow-600 mr-4" />
+                      <div>
+                        <h3 className="text-xl font-bold">Grand Prize Winner</h3>
+                        <p className="text-2xl font-semibold text-yellow-800">
+                          {winners[0].First_Name} {winners[0].Last_Name}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center mt-2 bg-yellow-50 p-2 rounded-md">
+                      <Mail className="h-4 w-4 text-yellow-600 mr-2" />
+                      <p className="text-sm font-medium text-yellow-700">{winners[0].email}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -109,13 +157,19 @@ export default function PrizePicker() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {winners.slice(1).map((winner, index) => (
                   <Card key={index} className="bg-blue-50 border-blue-200">
-                    <CardContent className="flex items-center p-4">
-                      <Medal className="h-8 w-8 text-blue-500 mr-3" />
-                      <div>
-                        <h4 className="text-sm font-medium text-blue-600">Runner-up #{index + 1}</h4>
-                        <p className="text-lg font-medium">
-                          {winner.First_Name} {winner.Last_Name}
-                        </p>
+                    <CardContent className="flex flex-col p-4">
+                      <div className="flex items-center mb-2">
+                        <Medal className="h-8 w-8 text-blue-500 mr-3" />
+                        <div>
+                          <h4 className="text-sm font-medium text-blue-600">Runner-up #{index + 1}</h4>
+                          <p className="text-lg font-medium">
+                            {winner.First_Name} {winner.Last_Name}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center mt-1 bg-white/80 p-1.5 rounded-md">
+                        <Mail className="h-3.5 w-3.5 text-blue-500 mr-1.5" />
+                        <p className="text-xs font-medium text-blue-600">{winner.email}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -124,11 +178,18 @@ export default function PrizePicker() {
             </div>
           )}
         </CardContent>
-        <CardFooter className="flex justify-center">
+        <CardFooter className="flex flex-col gap-2">
           {winners.length > 0 && (
-            <Button onClick={handlePickAgain} disabled={isLoading} className="bg-blue-600 hover:bg-blue-700">
-              {isLoading ? "Selecting..." : "Pick Again"}
-            </Button>
+            <>
+              <Button onClick={handlePickAgain} disabled={isLoading} className="bg-blue-600 hover:bg-blue-700">
+                {isLoading ? "Selecting..." : "Pick Again"}
+              </Button>
+              {previousWinners.size > 5 && (
+                <p className="text-xs text-gray-500 text-center">
+                  {previousWinners.size - winners.length} previous winners excluded from selection
+                </p>
+              )}
+            </>
           )}
         </CardFooter>
       </Card>

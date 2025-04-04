@@ -16,6 +16,7 @@ export function parseCSV<T>(csvText: string): T[] {
 
   // Process data rows
   const results: T[] = []
+  const emailSet = new Set<string>() // Track unique emails
 
   for (let i = 1; i < lines.length; i++) {
     const currentLine = lines[i].split(",").map((value) => value.trim())
@@ -36,6 +37,16 @@ export function parseCSV<T>(csvText: string): T[] {
         obj[header] = value
       }
     })
+
+    // Check for duplicate email
+    const email = obj.email?.toLowerCase()
+    if (email) {
+      if (emailSet.has(email)) {
+        // Skip this entry as it's a duplicate
+        continue
+      }
+      emailSet.add(email)
+    }
 
     results.push(obj as T)
   }
