@@ -52,7 +52,7 @@ export default function PrizePicker() {
     } catch (error) {
       console.error("Error parsing CSV:", error)
       alert(
-        "Error parsing CSV file. Please make sure it's a valid CSV with First_Name, Last_Name, Created, and email columns.",
+        "Error parsing CSV file. Please make sure it's a valid CSV with First_Name, Last_Name, Created, and company columns.",
       )
     } finally {
       setIsLoading(false)
