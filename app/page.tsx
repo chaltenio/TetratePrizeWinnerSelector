@@ -148,7 +148,7 @@ export default function PrizePicker() {
                     </div>
                     <div className="flex items-center mt-2 bg-yellow-50 p-2 rounded-md">
                       <Mail className="h-4 w-4 text-yellow-600 mr-2" />
-                      <p className="text-sm font-medium text-yellow-700">{winners[0].Company}</p>
+                      <p className="text-sm font-medium text-yellow-700">{winners[0].company}</p>
                     </div>
                   </CardContent>
                 </Card>
