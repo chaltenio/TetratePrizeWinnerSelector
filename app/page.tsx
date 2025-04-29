@@ -45,7 +45,7 @@ export default function PrizePicker() {
 
       // Add these winners to the set of previous winners
       const newPreviousWinners = new Set(previousWinners)
-      selected.forEach((winner) => newPreviousWinners.add(winner.email))
+      selected.forEach((winner) => newPreviousWinners.add(winner.Last_Name))
       setPreviousWinners(newPreviousWinners)
 
       setWinners(selected)
@@ -66,7 +66,7 @@ export default function PrizePicker() {
     setTimeout(() => {
       if (allFriendsRef.current.length > 0) {
         // Filter out previously selected winners
-        const availableFriends = allFriendsRef.current.filter((friend) => !previousWinners.has(friend.email))
+        const availableFriends = allFriendsRef.current.filter((friend) => !previousWinners.has(friend.Last_Name))
 
         // Check if we have enough available friends
         if (availableFriends.length < 5) {
@@ -81,7 +81,7 @@ export default function PrizePicker() {
 
         // Add these winners to the set of previous winners
         const newPreviousWinners = new Set(previousWinners)
-        selected.forEach((winner) => newPreviousWinners.add(winner.email))
+        selected.forEach((winner) => newPreviousWinners.add(winner.Last_Name))
         setPreviousWinners(newPreviousWinners)
 
         setWinners(selected)
@@ -106,7 +106,7 @@ export default function PrizePicker() {
               <div className="text-center">
                 <h3 className="text-lg font-medium">Upload the friends list</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Select your CSV file with First_Name, Last_Name, Created, and email columns
+                  Select your CSV file with First_Name, Last_Name, Created, and company columns
                 </p>
               </div>
               <div className="relative">
@@ -169,7 +169,7 @@ export default function PrizePicker() {
                       </div>
                       <div className="flex items-center mt-1 bg-white/80 p-1.5 rounded-md">
                         <Mail className="h-3.5 w-3.5 text-blue-500 mr-1.5" />
-                        <p className="text-xs font-medium text-blue-600">{winner.email}</p>
+                        <p className="text-xs font-medium text-blue-600">{winner.Last_Name}</p>
                       </div>
                     </CardContent>
                   </Card>
