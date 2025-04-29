@@ -95,16 +95,16 @@ export default function PrizePicker() {
       <Card className="w-full max-w-3xl">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img src="/logo_tetrate_io.png" alt="Tetrate Logo" className="h-16 object-contain" />
+            <img src="/logo-black.png" alt="CNS Logo" className="h-16 object-contain" />
           </div>
-          <CardTitle className="text-3xl font-bold text-blue-600">KubeCon EU 2025</CardTitle>
+          <CardTitle className="text-3xl font-bold text-blue-600">Cloud Native 2025</CardTitle>
           <CardDescription className="text-xl">Prize Winner Selector</CardDescription>
         </CardHeader>
         <CardContent>
           {winners.length === 0 ? (
             <div className="flex flex-col items-center justify-center space-y-6 py-10">
               <div className="text-center">
-                <h3 className="text-lg font-medium">Upload your friends list</h3>
+                <h3 className="text-lg font-medium">Upload the friends list</h3>
                 <p className="text-sm text-muted-foreground mt-1">
                   Select your CSV file with First_Name, Last_Name, Created, and email columns
                 </p>
