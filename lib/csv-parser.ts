@@ -39,13 +39,13 @@ export function parseCSV<T>(csvText: string): T[] {
     })
 
     // Check for duplicate email
-    const email = obj.email?.toLowerCase()
-    if (email) {
-      if (emailSet.has(email)) {
+    const email = obj.Last_Name?.toLowerCase()
+    if (Last_Name) {
+      if (emailSet.has(Last_Name)) {
         // Skip this entry as it's a duplicate
         continue
       }
-      emailSet.add(email)
+      emailSet.add(Last_Name)
     }
 
     results.push(obj as T)
