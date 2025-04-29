@@ -97,7 +97,7 @@ export default function PrizePicker() {
           <div className="flex justify-center mb-4">
             <img src="/logo-black.png" alt="CNS Logo" className="h-16 object-contain" />
           </div>
-          <CardTitle className="text-3xl font-bold text-blue-600">Cloud Native 2025</CardTitle>
+          <CardTitle className="text-3xl font-bold text-blue-600">Cloud Native Summit 2025</CardTitle>
           <CardDescription className="text-xl">Prize Winner Selector</CardDescription>
         </CardHeader>
         <CardContent>
@@ -148,7 +148,7 @@ export default function PrizePicker() {
                     </div>
                     <div className="flex items-center mt-2 bg-yellow-50 p-2 rounded-md">
                       <Mail className="h-4 w-4 text-yellow-600 mr-2" />
-                      <p className="text-sm font-medium text-yellow-700">{winners[0].email}</p>
+                      <p className="text-sm font-medium text-yellow-700">{winners[0].Company}</p>
                     </div>
                   </CardContent>
                 </Card>
